@@ -18,6 +18,29 @@ export const SESSIONS_FILE = path.join(STATE_DIR, "sessions.json");
 /** Persistent model cache store. */
 export const MODELS_CACHE_FILE = path.join(STATE_DIR, "models.json");
 
+/** Env override for the context window reported in `usage_update`. */
+export const CONTEXT_WINDOW_ENV = "AGY_CONTEXT_WINDOW";
+
+/**
+ * Context window used to render `usage_update` as a ratio.
+ *
+ * agy does not expose the per-model limit offline: `agy models` lists ids and
+ * display names only, and neither the conversation database nor the CLI cache
+ * records a window size, so this is a best-effort default for the Gemini 3.x
+ * families agy currently ships (1M tokens, the same order of magnitude as the
+ * Gemini models on the desktop app). Set `AGY_CONTEXT_WINDOW` when the real
+ * limit differs; clients that only display the token count ignore this value.
+ */
+export const DEFAULT_CONTEXT_WINDOW_TOKENS = 1_000_000;
+
+export function contextWindowTokens(): number {
+	const configured = process.env[CONTEXT_WINDOW_ENV]?.trim();
+	const value = configured ? Number(configured) : Number.NaN;
+	return Number.isFinite(value) && value > 0
+		? Math.floor(value)
+		: DEFAULT_CONTEXT_WINDOW_TOKENS;
+}
+
 /** Poll interval (ms) for streaming new steps during a live prompt turn. */
 export const POLL_INTERVAL_MS = 200;
 
