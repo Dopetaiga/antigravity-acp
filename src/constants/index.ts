@@ -33,12 +33,22 @@ export const CONTEXT_WINDOW_ENV = "AGY_CONTEXT_WINDOW";
  */
 export const DEFAULT_CONTEXT_WINDOW_TOKENS = 1_000_000;
 
-export function contextWindowTokens(): number {
+function configuredContextWindow(): number | null {
 	const configured = process.env[CONTEXT_WINDOW_ENV]?.trim();
-	const value = configured ? Number(configured) : Number.NaN;
-	return Number.isFinite(value) && value > 0
-		? Math.floor(value)
-		: DEFAULT_CONTEXT_WINDOW_TOKENS;
+	if (!configured) return null;
+	const parsed = Number(configured);
+	// A fractional or sub-token override would floor to zero, and a zero window
+	// makes every client-side ratio a division by zero; treat it as unset.
+	return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : null;
+}
+
+export function contextWindowTokens(): number {
+	return configuredContextWindow() ?? DEFAULT_CONTEXT_WINDOW_TOKENS;
+}
+
+/** True when the reported window is the built-in default, not a configured limit. */
+export function contextWindowIsEstimated(): boolean {
+	return configuredContextWindow() === null;
 }
 
 /** Poll interval (ms) for streaming new steps during a live prompt turn. */

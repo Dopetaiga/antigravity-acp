@@ -186,6 +186,8 @@ describe("conversation/translator", () => {
 				cacheReadTokens: 16609,
 				reasoningTokens: 165,
 				visibleOutputTokens: 60,
+				// The window is the built-in estimate here, so a client can hide the ratio.
+				windowEstimated: true,
 			});
 		});
 
@@ -233,6 +235,7 @@ describe("conversation/translator", () => {
 				) as any;
 				expect(usageUpdate.size).toBe(200000);
 				expect(usageUpdate.used).toBe(1000);
+				expect(usageUpdate._meta.agy.windowEstimated).toBe(false);
 			} finally {
 				if (previous === undefined) delete process.env.AGY_CONTEXT_WINDOW;
 				else process.env.AGY_CONTEXT_WINDOW = previous;

@@ -14,7 +14,7 @@
 // the two modes are just small branches inside it.
 
 import type { SessionUpdate } from "@agentclientprotocol/sdk";
-import { contextWindowTokens } from "../constants";
+import { contextWindowIsEstimated, contextWindowTokens } from "../constants";
 import { filterNarration, isNarration } from "../narration";
 import type { StepRow } from "../types";
 import { toolCallId } from "../updates/utils";
@@ -244,6 +244,8 @@ export class Translator {
 					cacheReadTokens: usage.cacheReadTokens,
 					reasoningTokens: usage.reasoningTokens,
 					visibleOutputTokens: usage.visibleOutputTokens,
+					// Lets a client hide the ratio when the window is the estimate.
+					windowEstimated: contextWindowIsEstimated(),
 				},
 			},
 		} as SessionUpdate);
